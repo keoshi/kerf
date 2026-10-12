@@ -2,6 +2,8 @@
 
 **Cut Figma designs on a Silhouette cutter** over Bluetooth, without Silhouette Studio.
 
+![Kerf: the Figma plugin previewing a sticker sheet on a CAMEO 4 mat, ready to cut](docs/store/cover.png)
+
 Verified on the **CAMEO 4**. Other Bluetooth models (CAMEO 4 Plus/Pro, CAMEO 5 family, Portrait 3/4, Curio 2) are
 detected and use their own cutting width and mat size, but are untested: see [CONTRIBUTING.md](CONTRIBUTING.md) to help.
 
@@ -52,9 +54,10 @@ Use one helper at a time: the app and `kerf` listen on the same port.
 
 ### 2. The Figma plugin
 
-Search for **Kerf: Cut on Silhouette** in Figma's Community.
+**Kerf: Cut on Silhouette** has been submitted to the Figma Community and is in review. Once it's approved, it'll be at
+[figma.com/community/plugin/1691487696942320040](https://www.figma.com/community/plugin/1691487696942320040).
 
-Until it's listed there, [download the plugin](https://github.com/keoshi/kerf/releases/latest/download/Kerf-Figma-plugin.zip),
+Until then, [download the plugin](https://github.com/keoshi/kerf/releases/latest/download/Kerf-Figma-plugin.zip),
 unzip it, and in Figma desktop choose **Plugins → Development → Import plugin from manifest…** → `manifest.json`.
 
 ### Before cutting
