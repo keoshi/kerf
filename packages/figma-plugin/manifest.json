@@ -12,6 +12,6 @@
     "allowedDomains": [
       "http://localhost:47821"
     ],
-    "reasoning": "Sends cut jobs to the Silhouette helper app running on this computer, which drives the cutter over Bluetooth."
+    "reasoning": "Kerf sends cut jobs to its companion app (Kerf for Silhouette, or the open-source `kerf` command) running on this computer at localhost:47821, which drives the Silhouette cutter over Bluetooth. Nothing leaves the computer."
   }
 }

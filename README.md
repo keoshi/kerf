@@ -157,6 +157,10 @@ Owners of other Silhouette models can help a lot with a 2-minute read-only probe
 - Protocol details were cross-checked against
   [fablabnbg/inkscape-silhouette](https://github.com/fablabnbg/inkscape-silhouette) (GPL-2.0, used as a reference only; no code copied).
 
+## Privacy
+
+Kerf runs entirely on your computer: no accounts, analytics or servers. See [PRIVACY.md](PRIVACY.md).
+
 ## License
 
 [MIT](LICENSE).

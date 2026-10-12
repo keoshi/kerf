@@ -3,10 +3,12 @@
 //   xcrun swift src/make-icons.swift <output dir>
 //
 // Writes AppIcon.iconset/ (all sizes for iconutil) and MenuBarIcon.png / MenuBarIcon@2x.png (template images).
+// With --plugin-icon, writes only PluginIcon.png: the same art full-bleed at 1024², for the Figma plugin listing.
 
 import AppKit
 
 let out = URL(fileURLWithPath: CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : ".")
+let pluginIcon = CommandLine.arguments.contains("--plugin-icon")
 
 /// The blade in a 100×100 box (y up): a #11 craft blade, heel at the top right, tip at the bottom left,
 /// with the slot that holds it in a handle.
@@ -57,12 +59,12 @@ func write(_ rep: NSBitmapImageRep, _ url: URL) {
 
 let orange = NSColor(srgbRed: 1.0, green: 0.42, blue: 0.17, alpha: 1)
 
-func appIcon(_ size: Int) -> NSBitmapImageRep {
+func appIcon(_ size: Int, fullBleed: Bool = false) -> NSBitmapImageRep {
   bitmap(size) { canvas in
-    let s = canvas.width / 1024
-    // macOS icon grid: an 824×824 rounded square centred on the 1024 canvas.
-    let tile = CGRect(x: 100 * s, y: 100 * s, width: 824 * s, height: 824 * s)
-    let shape = NSBezierPath(roundedRect: tile, xRadius: 185 * s, yRadius: 185 * s)
+    let s = canvas.width / (fullBleed ? 824 : 1024)
+    // macOS icon grid: an 824×824 rounded square centred on the 1024 canvas. Full-bleed: the square only.
+    let tile = fullBleed ? canvas : CGRect(x: 100 * s, y: 100 * s, width: 824 * s, height: 824 * s)
+    let shape = fullBleed ? NSBezierPath(rect: tile) : NSBezierPath(roundedRect: tile, xRadius: 185 * s, yRadius: 185 * s)
 
     NSGraphicsContext.saveGraphicsState()
     let shadow = NSShadow()
@@ -139,6 +141,12 @@ func menuBarIcon(_ size: Int) -> NSBitmapImageRep {
     NSColor.black.setStroke()
     cut.stroke()
   }
+}
+
+if pluginIcon {
+  try? FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
+  write(appIcon(1024, fullBleed: true), out.appendingPathComponent("PluginIcon.png"))
+  exit(0)
 }
 
 let iconset = out.appendingPathComponent("AppIcon.iconset")

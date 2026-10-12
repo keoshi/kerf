@@ -2,6 +2,10 @@
 
 import {
   bounds,
+  buildJob,
+  describeBytes,
+  encodeCommands,
+  orderInsideOut,
   type CutRequest,
   type CutSettings,
   type CutterModel,
@@ -318,7 +322,7 @@ function renderJob() {
 function updateButtons() {
   const hasPaths = enabledPaths().length > 0;
   const running = jobRunning();
-  el.dryRun.disabled = !hasPaths || !helper;
+  el.dryRun.disabled = !hasPaths;
   el.cut.disabled = !hasPaths || !helper || running || helper.helper.dryRun;
 }
 
@@ -338,13 +342,13 @@ el.cancel.addEventListener("click", () => {
   api("/jobs/cancel", { method: "POST", body: "{}" }).catch(showError);
 });
 
-el.dryRun.addEventListener("click", async () => {
+// Built here with the same core code the helper uses, so it works without the helper or a cutter.
+el.dryRun.addEventListener("click", () => {
   try {
-    const { job } = await api<{ job: { commands: string; totalBytes: number } }>("/jobs?dryRun=1", {
-      method: "POST",
-      body: JSON.stringify(request()),
-    });
-    el.commands.textContent = job.commands;
+    const req = request();
+    const commands = buildJob(orderInsideOut(req.paths), { ...req.settings, blade: req.blade, model });
+    const bytes = encodeCommands(commands);
+    el.commands.textContent = `${model.name} · ${bytes.length} bytes\n\n${describeBytes(bytes)}`;
     el.commandsBox.hidden = false;
     el.commandsBox.open = true;
   } catch (err) {
@@ -356,7 +360,7 @@ el.cut.addEventListener("click", async () => {
   el.cut.disabled = true;
   try {
     await api("/jobs", { method: "POST", body: JSON.stringify(request()) });
-    toPlugin({ type: "notify", message: "Sending to the Cameo…" });
+    toPlugin({ type: "notify", message: "Sending to the cutter…" });
   } catch (err) {
     showError(err);
   }
