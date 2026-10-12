@@ -113,6 +113,8 @@ The Cameo 4 test in `core.test.ts` must keep passing byte for byte.
 
 ## Code
 
+Setup, building and releasing are covered in [DEVELOPMENT.md](DEVELOPMENT.md).
+
 ```sh
 git clone https://github.com/keoshi/kerf.git && cd kerf
 npm install && npm run build
