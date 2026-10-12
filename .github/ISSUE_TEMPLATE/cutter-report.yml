@@ -1,0 +1,62 @@
+name: Cutter report
+description: Share how this project works with your Silhouette cutter (probe, test cut or Studio capture)
+title: "[Cutter] <model>: <probe / test cut / capture>"
+labels: ["cutter-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing! See [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md) for the steps.
+        Any level helps: a read-only probe is already useful.
+  - type: dropdown
+    id: model
+    attributes:
+      label: Model
+      options:
+        - CAMEO 4
+        - CAMEO 4 PLUS
+        - CAMEO 4 PRO
+        - CAMEO 5
+        - CAMEO 5 PLUS
+        - CAMEO 5 PRO
+        - CAMEO 5 ALPHA
+        - CAMEO 5 ALPHA PLUS
+        - CAMEO PRO MARK2
+        - PORTRAIT 3
+        - PORTRAIT 4
+        - CURIO 2
+        - Other (say below)
+    validations:
+      required: true
+  - type: dropdown
+    id: level
+    attributes:
+      label: What did you try?
+      multiple: true
+      options:
+        - "Level 1: probe (read-only)"
+        - "Level 2: test cut"
+        - "Level 3: Silhouette Studio capture"
+    validations:
+      required: true
+  - type: textarea
+    id: probe
+    attributes:
+      label: Probe output
+      description: Paste the JSON printed by `npm run probe`, or the error if it failed.
+      render: json
+  - type: textarea
+    id: cut
+    attributes:
+      label: Test cut results
+      description: Did it cut? Position and size correct (20 × 20 mm square)? Depth OK? Material and settings used?
+  - type: textarea
+    id: capture
+    attributes:
+      label: Studio capture
+      description: Attach the decoded `studio-capture.txt` and the Studio settings you used.
+  - type: input
+    id: system
+    attributes:
+      label: Computer
+      placeholder: "macOS 15.4, Apple Silicon, Node 22.18"

@@ -1,0 +1,14 @@
+{
+  "name": "@kerf/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Transport-agnostic Silhouette Cameo job building: geometry, GPGL, materials, BLE protocol constants",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p ."
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --gap: 8px;
+        --radius: 6px;
+        --accent: var(--figma-color-bg-brand, #0d99ff);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 12px;
+        font: 11px/16px Inter, system-ui, sans-serif;
+        color: var(--figma-color-text, #000);
+        background: var(--figma-color-bg, #fff);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: var(--gap);
+      }
+      .grow {
+        flex: 1;
+        min-width: 0;
+      }
+      .muted {
+        color: var(--figma-color-text-secondary, #666);
+      }
+      .error {
+        color: var(--figma-color-text-danger, #e03e1a);
+      }
+      .status {
+        padding: 8px 10px;
+        border-radius: var(--radius);
+        background: var(--figma-color-bg-secondary, #f5f5f5);
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex: none;
+        background: var(--figma-color-icon-tertiary, #bbb);
+      }
+      .dot.ok {
+        background: var(--figma-color-icon-success, #14ae5c);
+      }
+      .dot.warn {
+        background: var(--figma-color-icon-warning, #ffc21a);
+      }
+      .dot.bad {
+        background: var(--figma-color-icon-danger, #f24822);
+      }
+      code {
+        font: 10px/14px ui-monospace, monospace;
+        user-select: all;
+      }
+      .preview {
+        border: 1px solid var(--figma-color-border, #e6e6e6);
+        border-radius: var(--radius);
+        background: var(--figma-color-bg-secondary, #f5f5f5);
+        height: 200px;
+      }
+      .preview svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .object {
+        cursor: pointer;
+      }
+      .object .hit {
+        fill: transparent;
+        stroke: none;
+      }
+      .object:hover .hit {
+        fill: var(--figma-color-bg-brand, #0d99ff);
+        fill-opacity: 0.12;
+      }
+      .object.off {
+        opacity: 0.3;
+      }
+      label {
+        color: var(--figma-color-text-secondary, #666);
+      }
+      fieldset {
+        border: 0;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--gap);
+      }
+      fieldset label {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      input,
+      select,
+      button {
+        font: inherit;
+        color: inherit;
+      }
+      input[type="number"],
+      select {
+        width: 100%;
+        height: 28px;
+        padding: 0 6px;
+        border: 1px solid var(--figma-color-border, #e6e6e6);
+        border-radius: var(--radius);
+        background: var(--figma-color-bg, #fff);
+      }
+      button {
+        height: 28px;
+        padding: 0 12px;
+        border-radius: var(--radius);
+        border: 1px solid var(--figma-color-border, #e6e6e6);
+        background: var(--figma-color-bg, #fff);
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.primary {
+        border-color: transparent;
+        background: var(--accent);
+        color: var(--figma-color-text-onbrand, #fff);
+        font-weight: 600;
+      }
+      button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .progress {
+        height: 4px;
+        border-radius: 2px;
+        background: var(--figma-color-bg-tertiary, #e6e6e6);
+        overflow: hidden;
+      }
+      .progress > div {
+        height: 100%;
+        width: 0;
+        background: var(--accent);
+        transition: width 0.2s;
+      }
+      details pre {
+        max-height: 140px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        margin: 6px 0 0;
+      }
+      #cutter-hint:empty {
+        display: none;
+      }
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="status">
+      <div class="row">
+        <span id="dot" class="dot"></span>
+        <span id="status-text" class="grow">Looking for the helper…</span>
+        <button id="connect" hidden>Connect</button>
+      </div>
+      <div id="cutter-hint" class="muted"></div>
+      <div id="helper-hint" class="muted" hidden>
+        Open <strong>Kerf for Silhouette</strong> from Applications, or run <code>kerf</code> in Terminal.
+        Setup: see the Kerf README.
+      </div>
+    </div>
+
+    <div class="preview" id="preview" title="Click a shape to include or skip it"></div>
+    <div>
+      <div id="summary">Select shapes to cut.</div>
+      <div id="warnings" class="error"></div>
+    </div>
+
+    <div class="row">
+      <label for="material">Material</label>
+      <select id="material" class="grow"></select>
+    </div>
+    <fieldset>
+      <label>Force <input id="force" type="number" min="1" max="33" /></label>
+      <label>Speed <input id="speed" type="number" min="1" max="30" /></label>
+      <label>Depth <input id="depth" type="number" min="0" max="10" /></label>
+      <label>Passes <input id="passes" type="number" min="1" max="10" /></label>
+    </fieldset>
+    <div class="row">
+      <label for="blade">Blade</label>
+      <select id="blade" class="grow">
+        <option value="autoblade">AutoBlade (sets depth)</option>
+        <option value="manual">Ratchet / manual blade</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="unit">Units</label>
+      <select id="unit" class="grow"></select>
+      <button id="create-mat" title="Create a 12×12 inch mat frame">New mat</button>
+    </div>
+
+    <div class="row">
+      <button id="dry-run">Preview commands</button>
+      <span class="grow"></span>
+      <button id="cancel" hidden>Stop</button>
+      <button id="cut" class="primary">Cut</button>
+    </div>
+    <div id="job" hidden>
+      <div class="progress"><div id="progress"></div></div>
+      <div id="job-text" class="muted"></div>
+    </div>
+    <details id="commands-box" hidden>
+      <summary>GP-GL commands</summary>
+      <pre><code id="commands"></code></pre>
+    </details>
+
+    <!-- SCRIPT -->
+  </body>
+</html>

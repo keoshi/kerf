@@ -1,0 +1,17 @@
+{
+  "name": "Kerf: Cut on Silhouette",
+  "id": "silhouette-cut-dev",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "editorType": [
+    "figma"
+  ],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "http://localhost:47821"
+    ],
+    "reasoning": "Sends cut jobs to the Silhouette helper app running on this computer, which drives the cutter over Bluetooth."
+  }
+}

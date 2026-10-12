@@ -1,0 +1,12 @@
+{
+  "name": "@kerf/helper-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kerf.app: macOS menu-bar app that runs the helper and handles kerf:// links",
+  "type": "module",
+  "scripts": {
+    "app": "node build.mjs",
+    "install-app": "node build.mjs --install"
+  },
+  "license": "MIT"
+}

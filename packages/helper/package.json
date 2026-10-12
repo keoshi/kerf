@@ -1,0 +1,24 @@
+{
+  "name": "@kerf/helper",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kerf helper: bridges the Figma plugin and a Silhouette cutter over Bluetooth LE",
+  "type": "module",
+  "bin": {
+    "kerf": "dist/main.js"
+  },
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/main.js --external:@stoprocent/noble",
+    "start": "npm run build && node dist/main.js",
+    "dry-run": "npm run build && node dist/main.js --dry-run",
+    "probe": "npm run build && node dist/main.js probe",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@stoprocent/noble": "^2.8.0"
+  },
+  "devDependencies": {
+    "@kerf/core": "*"
+  },
+  "license": "MIT"
+}

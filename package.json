@@ -1,0 +1,32 @@
+{
+  "name": "kerf",
+  "private": true,
+  "description": "Kerf: cut Figma designs on a Silhouette cutter over Bluetooth",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "node --test 'packages/*/test/**/*.test.ts'",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "helper": "npm run start -w @kerf/helper",
+    "probe": "npm run probe -w @kerf/helper",
+    "app": "npm run build -w @kerf/helper && node packages/helper-app/build.mjs --install",
+    "install-cli": "npm run build -w @kerf/helper && npm install -g ./packages/helper"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.9.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keoshi/kerf.git"
+  },
+  "homepage": "https://github.com/keoshi/kerf"
+}
