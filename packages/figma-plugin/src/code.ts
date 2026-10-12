@@ -123,7 +123,7 @@ async function createMat(model: string, widthMm: number, heightMm: number) {
   const unitsPerMm = 1 / MM_PER_UNIT[unit];
   const inches = (mm: number) => +(mm / 25.4).toFixed(1);
   const frame = figma.createFrame();
-  frame.name = `${model} mat ${inches(widthMm)}"×${inches(heightMm)}"`;
+  frame.name = `${model} mat ${inches(widthMm)}″×${inches(heightMm)}″`;
   frame.resize(widthMm * unitsPerMm, heightMm * unitsPerMm);
   frame.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
   frame.strokes = [{ type: "SOLID", color: { r: 0.36, g: 0.73, b: 0.86 } }];

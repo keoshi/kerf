@@ -20,86 +20,49 @@ Figma plugin ──HTTP (localhost:47821)──▶ Kerf helper ──Bluetooth L
 
 How the protocol was worked out is documented in [`docs/silhouette-studio-findings.md`](docs/silhouette-studio-findings.md).
 
-## Setup
+## Install
 
-Requires Node 22.18+ to build, and macOS for the app. Linux/Windows should work for the terminal helper via noble,
-but are untested.
+You need two things: the **Figma plugin**, and the **Kerf helper** on your computer. Figma plugins can't use
+Bluetooth, so the helper talks to the cutter for them.
 
-```sh
-npm install
-npm run build
-```
+### 1. The Kerf helper: pick one
 
-**Quit Silhouette Studio before cutting from Figma.** The cutter stops advertising while Studio is connected to it.
+**Mac app (recommended).** [Download Kerf for Silhouette](https://github.com/keoshi/kerf/releases/latest/download/Kerf-for-Silhouette.zip),
+unzip it, drag **Kerf for Silhouette** to Applications and open it.
 
-There are two ways to run the helper. Use one at a time: both listen on the same port.
+- It lives in the menu bar (blade icon). Allow Bluetooth when macOS asks.
+- Turn on **Open at Login** in its menu to have it always ready. It's off by default.
+- Signed and notarized by Apple; runs on Apple Silicon and Intel Macs (macOS 13+).
 
-### Option A: the Kerf app (macOS)
-
-```sh
-npm run app
-```
-
-This builds **Kerf for Silhouette.app**, copies it to `~/Applications` and opens it. It lives in the menu bar (blade icon):
-
-- Allow Bluetooth when macOS asks.
-- Turn on **Open at Login** in its menu if you want it always available. It's off by default.
-- The cutter is connected only while the plugin is open, and released ~30 s after you close it,
-  so Silhouette Studio can still use it in between.
-- Log: menu → **Open Log** (`~/Library/Logs/Kerf/helper.log`).
-
-The app is self-contained: it bundles the official Node.js build (downloaded from nodejs.org and checksum-verified)
-and the helper, so it doesn't depend on your Node install.
-
-Build options (`node packages/helper-app/build.mjs …`):
-
-- `--install`: copy to `~/Applications` and open it (what `npm run app` does).
-- `--universal`: Apple Silicon + Intel.
-- `--identity "<name>"`: signing identity. The default is the first **Developer ID Application** certificate, else
-  **Apple Development**, else an ad-hoc signature. With an ad-hoc signature, macOS asks for Bluetooth permission again
-  after every rebuild.
-- `--notarize <profile>`: notarize and staple. This needs a Developer ID certificate and a `notarytool` keychain profile:
-  `xcrun notarytool store-credentials <profile> --apple-id <you> --team-id <team>`.
-
-Only a **Developer ID** signed and **notarized** build opens without warnings on other Macs. Apple Development and ad-hoc
-builds are for the Mac that built them.
-
-Release build (universal, signed with Developer ID, notarized and stapled):
+**Or the terminal command**, with no app (macOS, Linux or Windows, with [Node.js](https://nodejs.org) 22.18+):
 
 ```sh
-npm run build -w @kerf/helper
-node packages/helper-app/build.mjs --universal --notarize kerf-notary
-# → packages/helper-app/build/Kerf-<version>.zip, ready to share
+npm install -g https://github.com/keoshi/kerf/releases/latest/download/kerf-helper.tgz
+kerf
 ```
 
-### Option B: a terminal, no app
+Leave `kerf` running while you cut; Ctrl-C stops it. `kerf probe` checks the connection without moving the cutter.
+The first run asks for Bluetooth permission for your terminal app. Options:
 
-For anyone who'd rather not install an app, or isn't on macOS. Install the `kerf` command once, from this folder:
+- `--name "CAMEO 4-700181A"` picks a specific cutter
+- `--verbose` logs every reply from the cutter
+- `--dry-run` never touches Bluetooth; jobs are only encoded and logged
 
-```sh
-npm run install-cli   # builds the helper and links a global `kerf` command (npm install -g ./packages/helper)
-```
+Use one helper at a time: the app and `kerf` listen on the same port.
 
-Then, from any folder:
+### 2. The Figma plugin
 
-```sh
-kerf probe    # connect, print firmware/tools/status/model, disconnect (never moves the cutter)
-kerf          # run the local API for the plugin; Ctrl-C to stop
-```
+Search for **Kerf: Cut on Silhouette** in Figma's Community.
 
-Without installing, `npm run probe` and `npm run helper` do the same from this folder.
+Until it's listed there, [download the plugin](https://github.com/keoshi/kerf/releases/latest/download/Kerf-Figma-plugin.zip),
+unzip it, and in Figma desktop choose **Plugins → Development → Import plugin from manifest…** → `manifest.json`.
 
-- Quit the Kerf app first (menu → Quit Kerf); only one helper can run at a time.
-- The first run asks macOS for Bluetooth permission for your terminal app.
-- Options, e.g. `kerf --name "CAMEO 4-700181A"` (with npm: `npm run helper -- --name …`):
-  - `--name` picks a specific cutter
-  - `--verbose` logs every reply
-  - `--dry-run` never touches Bluetooth; jobs are only encoded and logged
-  - `--chunk <bytes>` changes the BLE write size (default 20)
+### Before cutting
 
-### 2. Load the plugin in Figma
+**Quit Silhouette Studio.** The cutter accepts one connection at a time.
 
-Figma desktop → **Plugins → Development → Import plugin from manifest…** → `packages/figma-plugin/manifest.json`.
+The helper connects when the plugin is open and lets go of the cutter about 30 seconds after you close it, so you can
+still use Studio in between.
 
 ## Using it
 
@@ -137,14 +100,52 @@ Inner shapes are cut before the shapes that contain them. Multiple passes repeat
 
 ## Development
 
+Requires Node 22.18+; the app needs macOS and Xcode.
+
 ```sh
+npm install
+npm run build
 npm test            # core unit tests
 npm run typecheck
 npm run watch -w @kerf/figma-plugin
 ```
 
-`tools/parse_bt_log.py` decodes Silhouette Studio's Bluetooth traffic from the macOS unified log
-(needs Apple's Bluetooth logging profile). See the findings doc.
+Run from source:
+
+- `npm run helper` / `npm run probe`: the helper from this checkout.
+- `npm run install-cli`: link a global `kerf` to this checkout.
+- `npm run app`: build **Kerf for Silhouette.app**, install it to `~/Applications` and open it.
+- In Figma, import `packages/figma-plugin/manifest.json`.
+
+### Building the app
+
+`node packages/helper-app/build.mjs [options]` bundles the official Node.js build (downloaded from nodejs.org and
+checksum-verified) with the helper.
+
+- `--install`: copy to `~/Applications` and open it (what `npm run app` does).
+- `--universal`: Apple Silicon + Intel.
+- `--identity "<name>"`: signing identity. The default is the first **Developer ID Application** certificate, else
+  **Apple Development**, else an ad-hoc signature. With an ad-hoc signature, macOS asks for Bluetooth permission again
+  after every rebuild.
+- `--notarize <profile>`: notarize and staple, with a Developer ID certificate and a `notarytool` keychain profile
+  (`xcrun notarytool store-credentials <profile> --apple-id <you> --team-id <team>`).
+
+Only Developer ID signed and notarized builds open without warnings on other Macs.
+
+### Releasing
+
+```sh
+node tools/release.mjs        # → release/: Kerf-for-Silhouette.zip, kerf-helper.tgz, Kerf-Figma-plugin.zip
+gh release create v<version> release/* --title "Kerf <version>"
+```
+
+File names carry no version, so the `releases/latest/download/…` links above always point at the newest release.
+
+### Other tools
+
+- `tools/parse_bt_log.py` decodes Silhouette Studio's Bluetooth traffic from the macOS unified log
+  (needs Apple's Bluetooth logging profile). See the findings doc.
+- `tools/store/make-assets.mjs` renders the Figma Community images in `docs/store/`.
 
 ## Contributing
 

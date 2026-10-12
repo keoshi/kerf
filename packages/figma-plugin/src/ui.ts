@@ -160,10 +160,12 @@ function renderSelection() {
     } else {
       const w = (b.maxX - b.minX).toFixed(1);
       const h = (b.maxY - b.minY).toFixed(1);
-      const where = sel.mat ? `on “${sel.mat.name}”, ${b.minX.toFixed(1)} mm from left, ${b.minY.toFixed(1)} mm from top` : "origin at selection corner";
+      // Non-breaking spaces keep numbers with their units when the summary wraps.
+      const mm = (v: number) => `${v.toFixed(1)}\u00a0mm`;
+      const where = sel.mat ? `on ${sel.mat.name}, ${mm(b.minX)} from\u00a0left, ${mm(b.minY)} from\u00a0top` : "origin at selection corner";
       const off = objects.filter((o) => disabled.has(o.id)).length;
       const count = off ? `${objects.length - off} of ${objects.length} objects` : `${objects.length} object${objects.length === 1 ? "" : "s"}`;
-      el.summary.textContent = `${count} · ${w} × ${h} mm · ${where}`;
+      el.summary.textContent = `${count} · ${w}\u00a0×\u00a0${h}\u00a0mm · ${where}`;
       if (b.minX < 0 || b.minY < 0) warnings.push("Some shapes stick out above or left of the mat.");
       if (b.maxX > model.widthMm)
         warnings.push(`Some shapes are beyond the ${model.name}'s ${+model.widthMm.toFixed(1)} mm cutting width.`);

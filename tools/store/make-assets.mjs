@@ -58,8 +58,8 @@ grid.forEach((row, r) =>
 );
 const selection = {
   objects,
-  mat: { name: 'CAMEO 4 mat 12"×12"', widthMm: MAT, heightMm: MAT },
-  label: 'CAMEO 4 mat 12"×12"',
+  mat: { name: "CAMEO 4 mat 12″×12″", widthMm: MAT, heightMm: MAT },
+  label: "CAMEO 4 mat 12″×12″",
   skipped: 0,
   errors: [],
 };
@@ -173,9 +173,10 @@ async function frame(name, { title, subtitle, body }) {
       background: radial-gradient(circle at 75% 20%, #2c2f36 0, #17181c 70%); color: #fff; display: flex; align-items: center;
       padding: 0 120px; gap: 100px; }
     .text { flex: 1; }
-    h1 { font-size: 76px; line-height: 1.05; letter-spacing: -2px; font-weight: 800; }
+    /* balance / pretty: no widows or runts in headlines and body copy. */
+    h1 { font-size: 76px; line-height: 1.05; letter-spacing: -2px; font-weight: 800; text-wrap: balance; }
     h1 em { font-style: normal; color: #ff6b2b; }
-    p { margin-top: 28px; font-size: 32px; line-height: 1.4; color: #b8bcc6; max-width: 760px; }
+    p { margin-top: 28px; font-size: 32px; line-height: 1.4; color: #b8bcc6; max-width: 760px; text-wrap: balance; }
     .window { border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 40px 120px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.08); }
     .titlebar { height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 18px; color: #111; font-size: 18px;
       font-weight: 600; border-bottom: 1px solid #e6e6e6; }

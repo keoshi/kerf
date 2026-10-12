@@ -59,6 +59,31 @@ func write(_ rep: NSBitmapImageRep, _ url: URL) {
 
 let orange = NSColor(srgbRed: 1.0, green: 0.42, blue: 0.17, alpha: 1)
 
+/// The blade and its cut line, centred on `target` by their combined bounding box and scaled so that box
+/// covers `fit` of the target. Widths and lengths are in the blade's 100-unit design space.
+func artwork(
+  centeredIn target: CGRect, fit: CGFloat, slotWidth: CGFloat, cutWidth: CGFloat, gap: CGFloat, cutLength: CGFloat, drop: CGFloat
+)
+  -> (blade: NSBezierPath, slot: NSBezierPath, cut: NSBezierPath)
+{
+  let (blade, slot, tip) = bladePath(in: CGRect(x: 0, y: 0, width: 100, height: 100))
+  let cut = NSBezierPath()
+  cut.lineCapStyle = .round
+  // Slightly below the tip, so the stroke clears the blade's edge.
+  cut.move(to: CGPoint(x: tip.x + gap, y: tip.y - drop))
+  cut.line(to: CGPoint(x: tip.x + gap + cutLength, y: tip.y - drop))
+  // Stroked extents: the cut's round caps and thickness, and the slot (always inside the blade).
+  let box = blade.bounds.union(cut.bounds.insetBy(dx: -cutWidth / 2, dy: -cutWidth / 2))
+  let k = fit * min(target.width / box.width, target.height / box.height)
+  var t = AffineTransform(translationByX: target.midX, byY: target.midY)
+  t.scale(k)
+  t.translate(x: -box.midX, y: -box.midY)
+  for path in [blade, slot, cut] { path.transform(using: t) }
+  slot.lineWidth = slotWidth * k
+  cut.lineWidth = cutWidth * k
+  return (blade, slot, cut)
+}
+
 func appIcon(_ size: Int, fullBleed: Bool = false) -> NSBitmapImageRep {
   bitmap(size) { canvas in
     let s = canvas.width / (fullBleed ? 824 : 1024)
@@ -94,15 +119,8 @@ func appIcon(_ size: Int, fullBleed: Bool = false) -> NSBitmapImageRep {
     }
     grid.stroke()
 
-    let art = tile.insetBy(dx: 90 * s, dy: 90 * s)
-    let (blade, slot, tip) = bladePath(in: art)
-
-    // The kerf: the cut trailing behind the tip.
-    let cut = NSBezierPath()
-    cut.lineWidth = 30 * s
-    cut.lineCapStyle = .round
-    cut.move(to: .init(x: tip.x + 40 * s, y: tip.y))
-    cut.line(to: .init(x: tile.maxX - 120 * s, y: tip.y))
+    // The blade and the kerf (the cut trailing behind the tip), centred on the tile.
+    let (blade, slot, cut) = artwork(centeredIn: tile, fit: 0.66, slotWidth: 5, cutWidth: 5, gap: 6, cutLength: 46, drop: 3.5)
     orange.setStroke()
     cut.stroke()
 
@@ -124,20 +142,14 @@ func appIcon(_ size: Int, fullBleed: Bool = false) -> NSBitmapImageRep {
 
 func menuBarIcon(_ size: Int) -> NSBitmapImageRep {
   bitmap(size) { canvas in
-    let s = canvas.width / 18
-    let (blade, slot, tip) = bladePath(in: canvas.insetBy(dx: -0.5 * s, dy: -0.5 * s).offsetBy(dx: 0, dy: 1 * s))
+    // Thicker strokes than the app icon so they survive 18 pt.
+    let (blade, slot, cut) = artwork(centeredIn: canvas, fit: 0.9, slotWidth: 7, cutWidth: 8, gap: 9, cutLength: 36, drop: 6)
     NSColor.black.setFill()
     blade.fill()
     // Clear the slot.
     NSGraphicsContext.current!.compositingOperation = .clear
-    slot.lineWidth = 1.6 * s
     slot.stroke()
     NSGraphicsContext.current!.compositingOperation = .sourceOver
-    let cut = NSBezierPath()
-    cut.lineWidth = 1.6 * s
-    cut.lineCapStyle = .round
-    cut.move(to: .init(x: tip.x + 2.2 * s, y: tip.y))
-    cut.line(to: .init(x: canvas.maxX - 1 * s, y: tip.y))
     NSColor.black.setStroke()
     cut.stroke()
   }

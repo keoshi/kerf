@@ -13,20 +13,18 @@ There are three levels of help. Each one is useful on its own, so stop wherever 
 
 ## Before you start
 
-- Requires macOS and Node 22.18+ (Linux and Windows may work for the helper, but are untested).
 - **Quit Silhouette Studio.** The cutter stops advertising over Bluetooth while Studio is connected.
 - Turn the cutter on and enable its Bluetooth.
+- Install the `kerf` command (needs [Node.js](https://nodejs.org) 22.18+; macOS, Linux or Windows):
 
 ```sh
-git clone https://github.com/keoshi/kerf.git && cd kerf
-npm install
-npm run build
+npm install -g https://github.com/keoshi/kerf/releases/latest/download/kerf-helper.tgz
 ```
 
 ## Level 1: probe (read-only, 2 minutes)
 
 ```sh
-npm run probe
+kerf probe
 ```
 
 This connects over Bluetooth and asks for the firmware version, the installed tools and the status, then disconnects.
@@ -55,12 +53,11 @@ or in a Bluetooth scanner app.
 
 Use **scrap paper on a mat** and conservative settings. A pen in the tool holder is even better, if you have one.
 
-1. Load the plugin in Figma desktop: **Plugins → Development → Import plugin from manifest…** →
-   `packages/figma-plugin/manifest.json`.
-2. Start the helper: `npm run helper`, or `npm run app` on macOS for the Kerf menu-bar app.
+1. Install the Figma plugin (see [Install](README.md#2-the-figma-plugin) in the README).
+2. Start the helper: run `kerf`, or open the **Kerf for Silhouette** app on macOS.
 3. In the plugin, click **New mat**. It uses your model's mat size once the cutter is connected.
 4. Draw a **20 × 20 mm square** 10 mm from the top and left, and a **circle** somewhere else.
-5. Select the frame, pick a material (e.g. *Copy paper*), and click **Cut**.
+5. Select the frame, pick a material (e.g. *Print Paper*), and click **Cut**.
 
 In the report, tell us:
 
@@ -117,6 +114,8 @@ The Cameo 4 test in `core.test.ts` must keep passing byte for byte.
 ## Code
 
 ```sh
+git clone https://github.com/keoshi/kerf.git && cd kerf
+npm install && npm run build
 npm test            # core unit tests
 npm run typecheck
 ```
